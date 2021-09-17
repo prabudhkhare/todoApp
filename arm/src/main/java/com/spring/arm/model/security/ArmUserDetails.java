@@ -3,22 +3,32 @@ package com.spring.arm.model.security;
 import com.spring.arm.jpa.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @AllArgsConstructor
 public class ArmUserDetails implements UserDetails {
     private final User user;
+    private final List<SimpleGrantedAuthority> authorityList;
+
+    public String getName(){
+        return this.user.getUsername();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorityList;
     }
 
     @Override
     public String getPassword() {
-        return null;
+        if(this.user == null){
+            throw new IllegalArgumentException("User does not exist.");
+        }
+        return this.user.getPassword();
     }
 
     @Override

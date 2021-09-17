@@ -34,6 +34,9 @@ public class User extends BaseEntity{
     private Date lastPasswordChanged;
     @Column(name = "failed_login_attempts")
     private Integer failedLoginAttempts;
+    @Column(name = "authorities")
+    private String authorities;
+
 
     @Override
     public boolean equals(Object object) {

@@ -11,7 +11,7 @@ import java.util.Base64;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserSignUpRequest {
+public class UserLoginRequest {
     private String emailId;
     private String username;
     private String password;

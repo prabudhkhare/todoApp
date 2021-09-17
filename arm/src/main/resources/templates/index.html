@@ -53,7 +53,7 @@
                         </span>
                     </button>
                 </span>
-            </div>    
+            </div>
 			<div class="app-header__content">
                 <div class="app-header-left">
                     <div class="search-wrapper">
@@ -82,7 +82,7 @@
                                 Contact us
                             </a>
                         </li>
-						
+
                     </ul>        </div>
                 <div class="app-header-right">
                     <div class="header-btn-lg pr-0">
@@ -98,10 +98,10 @@
                                         Login
                                     </div>-->
                                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
-                                           <a href="sign-in.html"> <button type="button" tabindex="0" class="dropdown-item">Sign in</button></a>
-										    <a href="sign-up.html"> <button type="button" tabindex="0" class="dropdown-item">Sign up</button></a>
+                                           <a th:href="@{/login/sign-in}"> <button type="button" tabindex="0" class="dropdown-item">Sign in</button></a>
+										    <a th:href="@{/login/sign-up}"> <button type="button" tabindex="0" class="dropdown-item">Sign up</button></a>
 											<a href="forgot-password.html"> <button type="button" tabindex="0" class="dropdown-item">Forgot Password</button></a>
-                                            
+
                                            <!-- <h6 tabindex="-1" class="dropdown-header">Sign up</h6>-->
                                             <button type="button" tabindex="0" class="dropdown-item">Actions</button>
                                             <div tabindex="-1" class="dropdown-divider"></div>
@@ -111,7 +111,7 @@
                                 </div>
                                 <div class="widget-content-left  ml-3 header-user-info">
                                     <div class="widget-heading">
-                                        Priyanka
+                                        <div th:if="${username != null}" th:text="${username}"></div>
                                     </div>
                                     <div class="widget-subheading">
                                        subheading if any
@@ -143,10 +143,10 @@
 
 
 
-	
-	<!--chat end-->		
-			
-        </div>      
+
+	<!--chat end-->
+
+        </div>
 
 
 
@@ -367,12 +367,12 @@
                                 </li>
                                 <li class="app-sidebar__heading">Login</li>
                                 <li>
-                                    <a href="sign-in.html" target="_blank">
+                                    <a th:href="@{/login/sign-in}" target="_blank">
                                         <i class="metismenu-icon fa fa-sign-in" style="color:#007bff">
                                         </i>
                                         Sign in
                                     </a>
-									<a href="sign-up.html" target="_blank">
+									<a th:href="@{/login/sign-up}" target="_blank">
                                         <i class="metismenu-icon fa fa-sign-in" style="color:#007bff">
                                         </i>
                                         Sign up

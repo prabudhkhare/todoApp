@@ -2,7 +2,7 @@ package com.spring.arm.service;
 
 import com.spring.arm.dao.UserDao;
 import com.spring.arm.jpa.entity.User;
-import com.spring.arm.model.login.UserSignUpRequest;
+import com.spring.arm.model.login.UserLoginRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,17 +17,17 @@ public class LoginServiceImpl implements LoginService{
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public boolean checkIfEmailAlreadyPresent(String email) throws Exception {
+    public boolean checkIfEmailAlreadyPresent(String email) {
         return userDao.getUserByEmail(email).isPresent();
     }
 
     @Override
-    public void saveNewUserDetails(UserSignUpRequest userSignUpRequest) throws Exception {
+    public void saveNewUserDetails(UserLoginRequest userLoginRequest) throws Exception {
         User user = new User();
         user.markNew();
-        user.setEmailId(userSignUpRequest.getEmailId());
-        user.setUsername(userSignUpRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(userSignUpRequest.getPassword()));
+        user.setEmailId(userLoginRequest.getEmailId());
+        user.setUsername(userLoginRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(userLoginRequest.getPassword()));
         user.setLastPasswordChanged(Date.from(Instant.now()));
         userDao.saveUser(user);
     }

@@ -1,8 +1,8 @@
 package com.spring.arm.service;
 
-import com.spring.arm.model.login.UserSignUpRequest;
+import com.spring.arm.model.login.UserLoginRequest;
 
 public interface LoginService {
-    boolean checkIfEmailAlreadyPresent(String email) throws Exception;
-    void saveNewUserDetails(UserSignUpRequest userSignUpRequest) throws Exception;
+    boolean checkIfEmailAlreadyPresent(String email);
+    void saveNewUserDetails(UserLoginRequest userLoginRequest) throws Exception;
 }

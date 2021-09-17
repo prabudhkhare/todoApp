@@ -13,7 +13,7 @@ public class UserDaoImpl implements UserDao{
     private final UserRepo userRepo;
 
     @Override
-    public Optional<User> getUserByEmail(String email) throws Exception {
+    public Optional<User> getUserByEmail(String email) {
         return userRepo.findById(email);
     }
 

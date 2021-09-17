@@ -1,6 +1,6 @@
 package com.spring.arm.validator;
 
-import com.spring.arm.model.login.UserSignUpRequest;
+import com.spring.arm.model.login.UserLoginRequest;
 import com.spring.arm.service.LoginService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -20,25 +20,24 @@ public class SignupPayloadValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return UserSignUpRequest.class.isAssignableFrom(aClass);
+        return UserLoginRequest.class.isAssignableFrom(aClass);
     }
 
-    @SneakyThrows
     @Override
     public void validate(Object o, Errors errors) {
-        UserSignUpRequest userSignUpRequest = (UserSignUpRequest)o;
-        if(!validateEmail(userSignUpRequest.getEmailId())){
+        UserLoginRequest userLoginRequest = (UserLoginRequest)o;
+        if(!validateEmail(userLoginRequest.getEmailId())){
             errors.rejectValue("emailId","1","email-id is not valid.");
         }
-        if(loginService.checkIfEmailAlreadyPresent(userSignUpRequest.getEmailId())){
+        if(loginService.checkIfEmailAlreadyPresent(userLoginRequest.getEmailId())){
             errors.rejectValue("emailId","1","email-id is already registered.");
         }
-        if(!StringUtils.hasText(userSignUpRequest.getUsername())){
+        if(!StringUtils.hasText(userLoginRequest.getUsername())){
             errors.rejectValue("username","1","username can't be null.");
         }
-        if(!StringUtils.hasText(userSignUpRequest.getPassword())){
+        if(!StringUtils.hasText(userLoginRequest.getPassword())){
             errors.rejectValue("password","1","password can't be null.");
-        }else if(userSignUpRequest.getPassword().length() < 6){
+        }else if(userLoginRequest.getPassword().length() < 6){
             errors.rejectValue("password","1","password length can't be less than 6.");
         }
     }
