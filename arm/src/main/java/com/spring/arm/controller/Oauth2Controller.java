@@ -32,13 +32,13 @@ public class Oauth2Controller {
     private String FACEBOOK_APP_ID;
     @Value("${spring.security.oauth2.client.registration.facebook.client-secret}")
     private String FACEBOOK_APP_SECRET;
-    @Value("${spring.security.oauth2.client.registration.facebook.redirect-uri}")
+    //@Value("${spring.security.oauth2.client.registration.facebook.redirect-uri}")
     private String FACEBOOK_REDIRECT_URI;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String GOOGLE_APP_ID;
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String GOOGLE_APP_SECRET;
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+ //   @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
     private String GOOGLE_REDIRECT_URI;
 
     @GetMapping("/doLoginFacebook")

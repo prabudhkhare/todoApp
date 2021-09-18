@@ -1,6 +1,7 @@
 package com.spring.arm.config;
 
-import com.spring.arm.filter.JwtRequestFilter;
+import com.spring.arm.handler.JwtRequestFilter;
+import com.spring.arm.handler.OAuth2AuthenticationSuccessHandler;
 import com.spring.arm.service.ArmUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -42,7 +43,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/index")
                 .permitAll()
                 .and()
-                .oauth2Login();
+                .oauth2Login()
+                .userInfoEndpoint()
+                .and()
+                .successHandler(new OAuth2AuthenticationSuccessHandler());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
 
