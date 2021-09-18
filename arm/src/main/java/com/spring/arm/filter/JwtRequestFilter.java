@@ -30,7 +30,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final ArmUserDetailsService armUserDetailsService;
     @Value("${server.servlet.context-path}")
     private String root;
-    private List<String> paths;
 
 
     public JwtRequestFilter(JwtUtil jwtUtil,ArmUserDetailsService armUserDetailsService){
@@ -41,11 +40,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        this.paths=Stream.of("/css", "/js", "/bootstrap")
+        List<String> paths = Stream.of("/css", "/js", "/bootstrap")
                 .map(s -> this.root + s)
                 .collect(Collectors.toList());
         boolean flag = false;
-        for(String p:this.paths){
+        for(String p: paths){
             if (path.startsWith(p)) {
                 flag = true;
                 break;

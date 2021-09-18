@@ -1,7 +1,6 @@
 package com.spring.arm.config;
 
 import com.spring.arm.filter.JwtRequestFilter;
-import com.spring.arm.model.security.ArmUserDetails;
 import com.spring.arm.service.ArmUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -12,12 +11,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
@@ -39,16 +35,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .authorizeRequests()
                 .antMatchers("/css/**","/js/**","/bootstrap/**").permitAll()
-                .antMatchers("/login/**","/index/**").permitAll()
+                .antMatchers("/login/**","/index/**","/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
+                .logoutSuccessUrl("/index")
                 .permitAll()
                 .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+                .oauth2Login();
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+
 
     }
 
