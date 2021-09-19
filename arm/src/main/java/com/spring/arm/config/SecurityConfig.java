@@ -1,9 +1,11 @@
 package com.spring.arm.config;
 
-import com.spring.arm.handler.JwtRequestFilter;
+import com.spring.arm.filter.JwtRequestFilter;
+import com.spring.arm.handler.ArmLogoutHandler;
+import com.spring.arm.handler.OAuth2AuthenticationFailureHandler;
 import com.spring.arm.handler.OAuth2AuthenticationSuccessHandler;
 import com.spring.arm.service.ArmUserDetailsService;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +18,28 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.stream.Stream;
+
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Value("${app.allowed.static.folders}")
+    private String allowedFolders;
     private final ArmUserDetailsService armUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final PasswordEncoder passwordEncoder;
+    private final ArmLogoutHandler armLogoutHandler;
+
+    public SecurityConfig(ArmUserDetailsService armUserDetailsService, JwtRequestFilter jwtRequestFilter, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler, OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler, PasswordEncoder passwordEncoder, ArmLogoutHandler armLogoutHandler) {
+        this.armUserDetailsService = armUserDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
+        this.passwordEncoder = passwordEncoder;
+        this.armLogoutHandler=armLogoutHandler;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -33,21 +49,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+       String[] paths= Stream.of(allowedFolders.split(","))
+                .map(p->"/"+p+"/**")
+                .toArray(String[]::new);
+
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/css/**","/js/**","/bootstrap/**").permitAll()
-                .antMatchers("/login/**","/index/**","/oauth2/**").permitAll()
+                .antMatchers(paths).permitAll()
+                .antMatchers("/","/login/**","/sign-up/**","/index/**","/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
-                .logoutSuccessUrl("/index")
+                .logoutUrl("/logout")
+                .addLogoutHandler(armLogoutHandler)
                 .permitAll()
                 .and()
                 .oauth2Login()
+                .loginPage("/login")
                 .userInfoEndpoint()
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

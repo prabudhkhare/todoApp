@@ -1,4 +1,4 @@
-package com.spring.arm.handler;
+package com.spring.arm.filter;
 
 import com.spring.arm.model.security.ArmUserDetails;
 import com.spring.arm.service.ArmUserDetailsService;
@@ -22,18 +22,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class JwtRequestFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtRequestFilter.class);
+    @Value("${app.allowed.static.folders}")
+    private String allowedFolders;
     private final JwtUtil jwtUtil;
     private final ArmUserDetailsService armUserDetailsService;
-    @Value("${server.servlet.context-path}")
-    private String root;
-
 
     public JwtRequestFilter(JwtUtil jwtUtil,ArmUserDetailsService armUserDetailsService){
         this.jwtUtil=jwtUtil;
@@ -43,12 +40,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        List<String> paths = Stream.of("/css", "/js", "/bootstrap")
-                .map(s -> this.root + s)
-                .collect(Collectors.toList());
+        if(path.contains("/logout")){
+            return true;
+        }
+        String[] paths = Stream.of(allowedFolders.split(","))
+                .map(p->"/"+p+"/")
+                .toArray(String[]::new);
         boolean flag = false;
         for(String p: paths){
-            if (path.startsWith(p)) {
+            if (path.contains(p)) {
                 flag = true;
                 break;
             }
@@ -58,29 +58,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String jwt=null;
-        Cookie[] cookies = request.getCookies();
-        if(request.getParameter("token")!=null){
-            jwt= URLDecoder.decode((String) request.getParameter("token"), StandardCharsets.UTF_8);
-        }else if(cookies!=null) {
-            for (Cookie cookie : cookies) {
-                if (JwtCookieUtil.JWT_HEADER_STRING.equals(cookie.getName())) {
-                    jwt = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        String email = null;
         LOGGER.info(request.getRequestURI());
+        String jwt =getJwtFromCookie(request);
+        if(jwt == null && request.getParameter("token")!=null){
+            jwt= URLDecoder.decode((String) request.getParameter("token"), StandardCharsets.UTF_8);
+        }
+        String id = null;
         try {
             if (jwt != null) {
-                email = jwtUtil.extractUsername(jwt);
+                id = jwtUtil.extractUserId(jwt);
             }
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (jwtUtil.validateToken(jwt, email)) {
+            if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (jwtUtil.validateToken(jwt, id)) {
                     ArmUserDetails userDetails;
                     try {
-                        userDetails = (ArmUserDetails) armUserDetailsService.loadUserByUsername(email);
+                        userDetails = (ArmUserDetails) armUserDetailsService.loadUserByUsername(id);
                     } catch (Exception e) {
                         throw new UsernameNotFoundException("Username not found in the database");
                     }
@@ -93,9 +85,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }catch (Exception e){
             LOGGER.info(e.getMessage());
-            response.sendRedirect("/arm/index");
         }
         chain.doFilter(request, response);
     }
 
+    private String getJwtFromCookie(HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        String jwt = null;
+        if(cookies!=null) {
+            for (Cookie cookie : cookies) {
+                if (JwtCookieUtil.JWT_HEADER_STRING.equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return jwt;
+    }
 }

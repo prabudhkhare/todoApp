@@ -20,10 +20,6 @@ public class JwtCookieUtil {
         return cookie+cookieExpire+"SameSite=Strict;Path=/;";
     }
 
-    public String getCookie(String username){
-        return jwtTokenUtil.generateToken(username);
-    }
-
     public String getLogoutCookie(){
         String cookie=JWT_HEADER_STRING+"=deleted;";
         String cookieExpire =getCookieExpiryString(0L);

@@ -4,6 +4,7 @@ import com.spring.arm.jpa.entity.User;
 import com.spring.arm.model.security.Provider;
 import com.spring.arm.service.LoginService;
 import com.spring.arm.util.JwtCookieUtil;
+import com.spring.arm.util.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private static final Logger LOGGER= LoggerFactory.getLogger(OAuth2AuthenticationSuccessHandler.class);
     private final LoginService loginService;
     private final JwtCookieUtil jwtCookieUtil;
+    private final JwtUtil jwtUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
@@ -67,10 +69,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             }
             httpServletRequest.logout();
             httpServletResponse.setHeader("Set-Cookie",jwtCookieUtil.getLoginCookie(user1.getId()));
-            httpServletResponse.sendRedirect("/arm/index?token="+ URLEncoder.encode(jwtCookieUtil.getCookie(user1.getId()), StandardCharsets.UTF_8));
+            httpServletResponse.sendRedirect("/arm?token="+ URLEncoder.encode(jwtUtil.generateTokenWith1MinExpiry(user1.getId()), StandardCharsets.UTF_8));
         }catch (Exception e){
             LOGGER.error(e.getMessage());
-            httpServletResponse.sendRedirect("/arm/login/sign-in");
+            httpServletResponse.sendRedirect("/arm/login");
         }
     }
 }

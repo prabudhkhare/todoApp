@@ -20,7 +20,7 @@ public class JwtUtil {
     private String EXPIRY;
 
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -42,22 +42,26 @@ public class JwtUtil {
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims,username);
+        return createToken(claims,username,Long.parseLong(EXPIRY));
+    }
+    public String generateTokenWith1MinExpiry(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims,username,60000L);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, String subject,Long milliSeconds) {
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(EXPIRY)))
+                .setExpiration(new Date(System.currentTimeMillis() +milliSeconds))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
     public Boolean validateToken(String token, String userName) {
-        final String username = extractUsername(token);
+        final String username = extractUserId(token);
         return (username.equals(userName) && !isTokenExpired(token));
     }
 

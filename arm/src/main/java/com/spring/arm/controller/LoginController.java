@@ -33,7 +33,6 @@ import java.util.TimeZone;
 
 @AllArgsConstructor
 @Controller
-@RequestMapping("/login")
 public class LoginController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
     private final SignupPayloadValidator signupPayloadValidator;
@@ -42,10 +41,10 @@ public class LoginController {
     private final AuthenticationManager authenticationManager;
     private final JwtCookieUtil jwtCookieUtil;
 
-    @GetMapping("/sign-in")
+    @GetMapping("/login")
     public String getSignInPage(@RequestParam(value = "signup",required = false) final String signup , Model model, Authentication authentication ){
         if(authentication!=null){
-            return "redirect:/index";
+            return "redirect:/";
         }
         if(signup!=null && signup.equals("success") ){
             model.addAttribute("isRedirectFromSignUp",true);
@@ -59,7 +58,7 @@ public class LoginController {
     @GetMapping("/sign-up")
     public String getSignUpPage(Model model,Authentication authentication ){
         if(authentication!=null){
-            return "redirect:/index";
+            return "redirect:/";
         }
         UserLoginRequest userLoginRequest = new UserLoginRequest();
         model.addAttribute("user", userLoginRequest);
@@ -73,10 +72,10 @@ public class LoginController {
             return "sign-up";
         }
         loginService.saveNewUserDetails(userLoginRequest);
-        return "redirect:sign-in?signup=success";
+        return "redirect:login?signup=success";
     }
 
-    @PostMapping("/sign-in")
+    @PostMapping("/login")
     public String signInUser(@ModelAttribute("user") UserLoginRequest userLoginRequest, BindingResult result, Model model, HttpServletResponse response) throws Exception {
         signInPayloadValidator.validate(userLoginRequest,result);
         if(result.hasErrors()){
@@ -98,14 +97,7 @@ public class LoginController {
             LOGGER.info("Successfully logged in with username = "+userDetails.getUsername()+" on -"+ LocalDateTime.now());
             response.setHeader("Set-Cookie",jwtCookieUtil.getLoginCookie(userDetails.getUsername()));
         }
-        return "redirect:/index";
+        return "redirect:/";
     }
-
-    @PostMapping("/logout")
-    public String logout(HttpServletResponse response) throws Exception {
-        response.setHeader("Set-Cookie",jwtCookieUtil.getLogoutCookie());
-        return "redirect:/index";
-    }
-
 
 }
