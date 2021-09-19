@@ -13,8 +13,8 @@ public class UserDaoImpl implements UserDao{
     private final UserRepo userRepo;
 
     @Override
-    public Optional<User> getUserByEmail(String email) {
-        return userRepo.findById(email);
+    public Optional<User> getUserById(String id) {
+        return userRepo.findById(id);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class SignupPayloadValidator implements Validator {
         if(!validateEmail(userLoginRequest.getEmailId())){
             errors.rejectValue("emailId","1","email-id is not valid.");
         }
-        if(loginService.checkIfEmailAlreadyPresent(userLoginRequest.getEmailId())){
+        if(loginService.checkIfIdAlreadyPresent(userLoginRequest.getEmailId())){
             errors.rejectValue("emailId","1","email-id is already registered.");
         }
         if(!StringUtils.hasText(userLoginRequest.getUsername())){

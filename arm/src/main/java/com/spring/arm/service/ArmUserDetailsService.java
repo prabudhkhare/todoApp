@@ -4,7 +4,6 @@ import com.spring.arm.dao.UserDao;
 import com.spring.arm.jpa.entity.User;
 import com.spring.arm.model.security.ArmUserDetails;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,7 +20,7 @@ public class ArmUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        Optional<User> user = userDao.getUserByEmail(s);
+        Optional<User> user = userDao.getUserById(s);
         if(user.isEmpty()){
             throw new UsernameNotFoundException("Username does not exist.");
         }
@@ -31,12 +29,12 @@ public class ArmUserDetailsService implements UserDetailsService {
         return new ArmUserDetails(user1,getAuthoritiesList(authorities));
     }
 
-    private ArrayList<SimpleGrantedAuthority> getAuthoritiesList(String authorities){
+    public static ArrayList<SimpleGrantedAuthority> getAuthoritiesList(String authorities){
         ArrayList<SimpleGrantedAuthority> roles = new ArrayList<>();
         if(authorities!= null){
             String[] authoritiesArray =  authorities.split(",");
             for(String authority:authoritiesArray){
-                SimpleGrantedAuthority auth  = new SimpleGrantedAuthority("ROLE_"+authority);
+                SimpleGrantedAuthority auth  = new SimpleGrantedAuthority(authority);
                 roles.add(auth);
             }
         }

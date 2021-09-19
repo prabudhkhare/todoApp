@@ -1,5 +1,6 @@
 package com.spring.arm.jpa.entity;
 
+import com.spring.arm.model.security.Provider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,11 @@ import java.util.Date;
 @Table(name = "t_user_details")
 public class User extends BaseEntity{
     @Id
+    @Column(name = "id")
+    private String id;
     @Column(name = "email_id")
     private String emailId;
-    @Column(name = "password",length = 5000,nullable = false)
+    @Column(name = "password",length = 5000)
     private String password;
     @Column(name = "username")
     private String username;
@@ -36,7 +39,9 @@ public class User extends BaseEntity{
     private Integer failedLoginAttempts;
     @Column(name = "authorities")
     private String authorities;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider",nullable = false)
+    private Provider provider;
 
     @Override
     public boolean equals(Object object) {

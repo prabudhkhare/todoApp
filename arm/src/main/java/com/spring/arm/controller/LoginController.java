@@ -3,6 +3,7 @@ package com.spring.arm.controller;
 import com.spring.arm.model.login.UserLoginRequest;
 import com.spring.arm.model.security.ArmUserDetails;
 import com.spring.arm.service.LoginService;
+import com.spring.arm.util.JwtCookieUtil;
 import com.spring.arm.util.JwtUtil;
 import com.spring.arm.validator.SignInPayloadValidator;
 import com.spring.arm.validator.SignupPayloadValidator;
@@ -35,12 +36,11 @@ import java.util.TimeZone;
 @RequestMapping("/login")
 public class LoginController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
-    private static final String JWT_HEADER_STRING = "Authorization";
     private final SignupPayloadValidator signupPayloadValidator;
     private final SignInPayloadValidator signInPayloadValidator;
     private final LoginService loginService;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtTokenUtil;
+    private final JwtCookieUtil jwtCookieUtil;
 
     @GetMapping("/sign-in")
     public String getSignInPage(@RequestParam(value = "signup",required = false) final String signup , Model model, Authentication authentication ){
@@ -96,26 +96,16 @@ public class LoginController {
         if(authenticate!= null && authenticate.isAuthenticated()) {
             ArmUserDetails userDetails=(ArmUserDetails)authenticate.getPrincipal();
             LOGGER.info("Successfully logged in with username = "+userDetails.getUsername()+" on -"+ LocalDateTime.now());
-            String cookie=JWT_HEADER_STRING+"="+jwtTokenUtil.generateToken(userDetails.getUsername())+";";
-            String cookieExpire =getCookieExpiryString(Long.parseLong(jwtTokenUtil.getEXPIRY()));
-            response.setHeader("Set-Cookie",cookie+cookieExpire+"SameSite=Strict;Path=/;");
+            response.setHeader("Set-Cookie",jwtCookieUtil.getLoginCookie(userDetails.getUsername()));
         }
         return "redirect:/index";
     }
 
     @PostMapping("/logout")
     public String logout(HttpServletResponse response) throws Exception {
-        String cookieExpire = getCookieExpiryString(0L);
-        String cookie=JWT_HEADER_STRING+"=deleted;";
-        response.setHeader("Set-Cookie",cookie+cookieExpire+"SameSite=Strict;Path=/;");
+        response.setHeader("Set-Cookie",jwtCookieUtil.getLogoutCookie());
         return "redirect:/index";
     }
 
-    private String getCookieExpiryString(Long expireAfterMilliSeconds){
-        Date expdate= new Date();
-        expdate.setTime(expdate.getTime()+expireAfterMilliSeconds);
-        DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", java.util.Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return "expires=" + df.format(expdate)+";";
-    }
+
 }

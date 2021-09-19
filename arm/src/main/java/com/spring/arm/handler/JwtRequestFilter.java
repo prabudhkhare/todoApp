@@ -2,6 +2,7 @@ package com.spring.arm.handler;
 
 import com.spring.arm.model.security.ArmUserDetails;
 import com.spring.arm.service.ArmUserDetailsService;
+import com.spring.arm.util.JwtCookieUtil;
 import com.spring.arm.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,12 +58,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String authorizationCookie = "Authorization";
         String jwt=null;
         Cookie[] cookies = request.getCookies();
-        if(cookies!=null) {
+        if(request.getParameter("token")!=null){
+            jwt= URLDecoder.decode((String) request.getParameter("token"), StandardCharsets.UTF_8);
+        }else if(cookies!=null) {
             for (Cookie cookie : cookies) {
-                if (authorizationCookie.equals(cookie.getName())) {
+                if (JwtCookieUtil.JWT_HEADER_STRING.equals(cookie.getName())) {
                     jwt = cookie.getValue();
                     break;
                 }
@@ -89,6 +93,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }catch (Exception e){
             LOGGER.info(e.getMessage());
+            response.sendRedirect("/arm/index");
         }
         chain.doFilter(request, response);
     }

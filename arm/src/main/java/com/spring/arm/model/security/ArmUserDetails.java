@@ -36,7 +36,7 @@ public class ArmUserDetails implements UserDetails {
         if(this.user == null){
             throw new IllegalArgumentException("User does not exist.");
         }
-        return this.user.getEmailId();
+        return this.user.getId();
     }
 
     @Override

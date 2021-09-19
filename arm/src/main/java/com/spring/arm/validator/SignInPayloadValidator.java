@@ -22,7 +22,7 @@ public class SignInPayloadValidator implements Validator {
     @Override
     public void validate(Object o, Errors errors) {
         UserLoginRequest userLoginRequest = (UserLoginRequest)o;
-        if(!loginService.checkIfEmailAlreadyPresent(userLoginRequest.getEmailId())){
+        if(!loginService.checkIfIdAlreadyPresent(userLoginRequest.getEmailId())){
             errors.rejectValue("emailId","1","email-id is not registered.");
         }
     }
